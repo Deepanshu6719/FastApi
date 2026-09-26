@@ -1,7 +1,9 @@
-from fastapi import FastAPI
+from fastapi import Depends,FastAPI
 from routers.products import router as product_router
 from routers.categories import router as category_router
-
+from sqlalchemy.orm import Session
+from database import get_db
+from sqlalchemy import text
 app=FastAPI()
 
 # @app.get("/")
@@ -29,3 +31,10 @@ app=FastAPI()
 
 app.include_router(product_router)
 app.include_router(category_router)
+
+@app.get("/db-check")
+def db_check(db:Session=Depends(get_db)):
+    result = db.execute(text("SELECT 1"))
+    value = result.scalar()
+
+    return {"database": value}
